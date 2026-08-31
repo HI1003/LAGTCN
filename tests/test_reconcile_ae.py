@@ -7,11 +7,11 @@ from pathlib import Path
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CODE_DIR = PROJECT_ROOT / "code"
+CODE_DIR = PROJECT_ROOT
 if str(CODE_DIR) not in sys.path:
     sys.path.insert(0, str(CODE_DIR))
 
-import reconcile_ae
+from lagtcn.reconciliation import methods as reconcile_ae
 
 
 def sum_matrix_2level() -> tuple[np.ndarray, int]:

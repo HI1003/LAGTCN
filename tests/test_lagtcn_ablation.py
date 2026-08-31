@@ -7,12 +7,12 @@ from pathlib import Path
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-CODE = ROOT / "code"
+CODE = ROOT
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
 
-from models_additional_baselines import LAGTCNBaseline, _LAGTCNBlock
-from graph_sparsity import FINAL_GRAPH_SOURCE_POLICY
+from lagtcn.models.graph_models import LAGTCNBaseline, _LAGTCNBlock
+from lagtcn.core.graphs import FINAL_GRAPH_SOURCE_POLICY
 
 
 class LAGTCNAblationTest(unittest.TestCase):

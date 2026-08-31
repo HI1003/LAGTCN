@@ -6,12 +6,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-for directory in (ROOT / "code", ROOT / "scripts"):
+for directory in (ROOT,):
     if str(directory) not in sys.path:
         sys.path.insert(0, str(directory))
 
-import build_ae_final_manifest
-from output_naming import RUN_LABEL_MAX_LEN, shorten_existing_run_label
+from reproduction.manifests import build_model_matrix as build_ae_final_manifest
+from lagtcn.core.naming import RUN_LABEL_MAX_LEN, shorten_existing_run_label
 
 
 class OutputNamingTest(unittest.TestCase):

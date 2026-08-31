@@ -13,20 +13,20 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-for search in (ROOT / "code", ROOT / "scripts"):
+for search in (ROOT,):
     if str(search) not in sys.path:
         sys.path.insert(0, str(search))
 
-import select_ae_graph_hparams as selector
-from build_ae_final_manifest import (
+from reproduction.selection import select_graph_hparams as selector
+from reproduction.manifests.build_model_matrix import (
     DATASETS,
     dataset_manifest_suffix,
     graph_flags,
     load_selected_graphs,
 )
-from build_ae_graph_tuning_manifest import candidates
-from graph_sparsity import GRAPH_DESIGN_PROTOCOL_VERSION
-from select_ae_graph_hparams import (
+from reproduction.manifests.build_graph_search import candidates
+from lagtcn.core.graphs import GRAPH_DESIGN_PROTOCOL_VERSION
+from reproduction.selection.select_graph_hparams import (
     SELECTION_RULE,
     SELECTION_VERSION,
     source_revision_provenance,
@@ -278,7 +278,7 @@ class GraphSelectionProtocolTest(unittest.TestCase):
                 return candidate_values[source]
 
             argv = [
-                "select_ae_graph_hparams.py",
+                "select_graph_hparams",
                 "--runs-root", str(runs_root),
                 "--experiment-id", "graph_tuning_e2e",
                 "--datasets", "toy",

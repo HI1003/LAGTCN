@@ -6,11 +6,11 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CODE_DIR = PROJECT_ROOT / "code"
+CODE_DIR = PROJECT_ROOT
 if str(CODE_DIR) not in sys.path:
     sys.path.insert(0, str(CODE_DIR))
 
-from output_naming import lagtcn_graph_sources
+from lagtcn.core.naming import lagtcn_graph_sources
 
 
 class LAGTCNGraphSourceMappingTest(unittest.TestCase):

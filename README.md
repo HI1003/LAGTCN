@@ -1,56 +1,84 @@
 # LAGTCN
 
-Official research code for **LAGTCN: Level-Aware Graph-Temporal Co-Evolution
-with Multiple Graph Sources for Hierarchical Electric Load Forecasting**.
+Official code for **LAGTCN: Level-Aware Graph-Temporal Co-Evolution with
+Multiple Graph Sources for Hierarchical Electric Load Forecasting**.
 
-LAGTCN combines level-aware temporal encoding, relation-specific graph message
-passing, and graph-temporal co-evolution for hierarchical load forecasting. The
-repository also contains the baselines, hierarchical reconciliation methods,
-and frozen experiment protocol used in the accompanying Applied Energy study.
+The repository is deliberately limited to code required to run LAGTCN and
+reproduce the paper. It includes the six reported baselines (DLinear, PatchTST,
+N-HiTS, iTransformer, DCRNN, and MTGNN) and the three reconciliation methods
+(BU, TD-FP, and MinT-SHR). Raw data, checkpoints, server launchers, exploratory
+models, and unrelated experiments are not included.
 
-## Repository layout
+[中文说明](README_zh-CN.md)
+
+## Repository structure
 
 ```text
-code/                Model, data loader, training, evaluation, reconciliation
-configs/             Frozen model and graph-control selections
-data_preparation/    Output-free notebooks and graph-building scripts
-docs/                Data and full-reproduction instructions
-scripts/             Manifest generation, selection, and post-processing
-tests/               Unit and protocol tests
-results/             Location for shareable, paper-facing result artifacts
+lagtcn/                       Source code
+├── train.py                  Training, validation, and test entry point
+├── core/                     Data loading, graph construction, metrics, training
+├── models/                   LAGTCN and the six paper baselines
+└── reconciliation/           BU, TD-FP, and MinT-SHR primitives
+reproduction/                 Paper reproduction commands
+├── data/                     Feature, structural-graph, and synthetic-data builders
+├── manifests/                Model-matrix and graph-search manifest builders
+├── selection/                Validation-only hyperparameter selection
+└── evaluation/               Reconciliation, final validation, and benchmarking
+configs/                      Frozen model and graph selections used in the paper
+data_preparation/             Preprocessing notebooks for the three datasets
+docs/                         Data contract and end-to-end reproduction guide
+tests/                        Model, protocol, and reconciliation tests
+results/                      Destination for small paper-facing artifacts
 ```
 
-Raw GEFCom files, processed arrays, checkpoints, and experiment output are not
-stored in Git. See [docs/DATA.md](docs/DATA.md) for the expected data contract.
+The model source code is under [`lagtcn/`](lagtcn/). Paper-level orchestration
+is under [`reproduction/`](reproduction/).
 
 ## Environment
 
-The frozen experiment environment uses Python 3.10, PyTorch 2.3, PyTorch
-Geometric 2.5.3, and CUDA 12.1:
+The frozen environment uses Python 3.10, PyTorch 2.3, PyTorch Geometric 2.5.3,
+and CUDA 12.1:
 
 ```bash
 conda create -n lagtcn python=3.10 -y
 conda activate lagtcn
 pip install -r requirements-cuda121.txt
-pip install pytest
 ```
 
-For CPU or another CUDA version, install the matching PyTorch and PyG wheels
-first, then install the version-pinned scientific packages in `requirements.txt`.
+For CPU or another CUDA version, install matching PyTorch/PyG wheels first and
+then install `requirements.txt`.
+
+## Formal paper configuration
+
+The formal experiments use a 168-hour input window, a 24-hour forecast horizon,
+three random seeds (42, 43, and 44), and effective batch size 128. These are the
+defaults of the training entry point; the frozen per-dataset learning rates,
+hidden sizes, and graph controls are stored in [`configs/`](configs/).
+
+```bash
+python -m lagtcn.train \
+  --dataset GEFCom2012_2level \
+  --model-name LAGTCN \
+  --graph-mode H \
+  --gnn-type gcn \
+  --temporal-type patch_transformer \
+  --num-timesteps-in 168 \
+  --num-timesteps-out 24 \
+  --batch-size 128
+```
+
+Use the generated manifests for reported experiments rather than manually
+guessing the remaining hyperparameters.
 
 ## Quick CPU smoke test
 
-Generate a deterministic, coherent 21-node hierarchy with the same loader
-contract as the two-level dataset:
+This deliberately reduced `24→1`, batch-32 configuration is only a fast
+software check; it is not a paper experiment.
 
 ```bash
-python scripts/make_synthetic_dataset.py
-```
+python -m reproduction.data.make_synthetic
 
-Then train a deliberately small LAGTCN instance for one epoch:
-
-```bash
-python code/main.py \
+python -m lagtcn.train \
   --data-root Data \
   --dataset GEFCom2012_2level \
   --model-name LAGTCN \
@@ -71,29 +99,17 @@ python code/main.py \
   --output-namespace ae/smoke
 ```
 
-The synthetic dataset is only a software check; it must not be used to support
-scientific claims.
-
-## Tests
+## Tests and full reproduction
 
 ```bash
-python -m pytest -q
+python -m unittest discover -s tests -p 'test_*.py' -q
 ```
 
-## Full reproduction
+Prepare the three GEFCom datasets according to [`docs/DATA.md`](docs/DATA.md),
+then follow [`docs/REPRODUCIBILITY.md`](docs/REPRODUCIBILITY.md).
 
-After preparing the three formal GEFCom datasets, follow
-[docs/REPRODUCIBILITY.md](docs/REPRODUCIBILITY.md). The protocol separates
-model tuning, validation-only graph selection, final training, post-hoc
-reconciliation, and checkpoint replay.
+## Citation and license
 
-## Citation
-
-Please use [CITATION.cff](CITATION.cff). The manuscript DOI will be added after
-publication.
-
-## License
-
-Code is released under the [MIT License](LICENSE). Dataset files retain their
-original providers' terms and are not redistributed here.
-
+Please use [`CITATION.cff`](CITATION.cff). Code is released under the
+[MIT License](LICENSE); datasets retain their original providers' terms and are
+not redistributed here.

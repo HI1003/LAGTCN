@@ -7,11 +7,11 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-for path in (ROOT / "code", ROOT / "scripts"):
+for path in (ROOT,):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-from postprocess_ae_mint_shrink import (
+from reproduction.evaluation.mint_shrink import (
     estimate_horizon_shrink_covariances,
     reconcile_horizonwise_mint_shrink,
     strict_validation_slice,

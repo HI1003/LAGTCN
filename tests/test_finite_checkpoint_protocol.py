@@ -10,11 +10,11 @@ import torch
 import torch.nn as nn
 
 ROOT = Path(__file__).resolve().parents[1]
-CODE = ROOT / "code"
+CODE = ROOT
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
 
-from train_eval import (
+from lagtcn.core.training import (
     CONFIG_FINGERPRINT_PROTOCOL_VERSION,
     _atomic_json_dump,
     _config_fingerprint,

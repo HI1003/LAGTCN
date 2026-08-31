@@ -10,11 +10,11 @@ import torch
 from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 
 ROOT = Path(__file__).resolve().parents[1]
-CODE = ROOT / "code"
+CODE = ROOT
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
 
-from data_loader import LoadDatasetLoader, TARGET_TIMESTAMP_SPLIT_VERSION
+from lagtcn.core.data import LoadDatasetLoader, TARGET_TIMESTAMP_SPLIT_VERSION
 
 
 class TargetTimestampSplitTest(unittest.TestCase):

@@ -20,7 +20,7 @@ venv/
 Data/
 logs/
 checkpoints/
-scripts/manifests/
+results/raw_manifests/
 *.ckpt
 *.pt
 *.pth
@@ -39,4 +39,3 @@ scripts/manifests/
 # OS
 .DS_Store
 Thumbs.db
-

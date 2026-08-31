@@ -8,11 +8,11 @@ import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-CODE = ROOT / "code"
+CODE = ROOT
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
 
-from graph_sparsity import (
+from lagtcn.core.graphs import (
     build_threshold_similarity_adj,
     build_threshold_similarity_adj_torch,
     build_topk_similarity_adj_torch,

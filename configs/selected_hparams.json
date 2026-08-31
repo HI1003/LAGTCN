@@ -51,10 +51,6 @@
   "terminal_status_file": "results/raw_manifests/tuning_260812j0_eta1_original_status_20260818.json",
   "runtime_git_binding": "provenance_only",
   "test_results_accessed": false,
-  "includes_deephgnn": false,
-  "optional_phase2_models": [
-    "DEEPHGNN_SPECTGNN"
-  ],
   "selected": {
     "GEFCom2012_2level": {
       "DCRNN": {

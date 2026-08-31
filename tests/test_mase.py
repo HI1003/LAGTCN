@@ -7,11 +7,11 @@ from pathlib import Path
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CODE_DIR = PROJECT_ROOT / "code"
+CODE_DIR = PROJECT_ROOT
 if str(CODE_DIR) not in sys.path:
     sys.path.insert(0, str(CODE_DIR))
 
-import mase
+from lagtcn.core import scaled_error as mase
 
 
 class NaiveScaleTest(unittest.TestCase):

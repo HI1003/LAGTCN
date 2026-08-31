@@ -11,33 +11,34 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-for directory in (ROOT / "code", ROOT / "scripts"):
+for directory in (ROOT,):
     if str(directory) not in sys.path:
         sys.path.insert(0, str(directory))
 
-import benchmark_ae_final
-from ae_protocol import is_formal_ae_stage
-import build_ae_final_manifest
-import postprocess_ae_final
-import select_ae_final_hparams
-from graph_sparsity import (
+from reproduction.evaluation import benchmark_checkpoints as benchmark_ae_final
+from lagtcn.core.protocol import is_formal_ae_stage
+from reproduction.manifests import build_model_matrix as build_ae_final_manifest
+from reproduction.evaluation import validate_final_matrix as postprocess_ae_final
+from reproduction.selection import select_model_hparams as select_ae_final_hparams
+from lagtcn.core.graphs import (
     FINAL_GRAPH_SOURCE_POLICY,
     GRAPH_DESIGN_PROTOCOL_VERSION,
 )
-from output_naming import LAGTCN_GRAPH_SOURCE_VERSION_CURRENT
-from data_loader import TARGET_TIMESTAMP_SPLIT_VERSION
-from mase import MASE_VERSION
-from metrics import calculate_level_metrics
-from train_eval import _compute_metrics
+from lagtcn.core.naming import LAGTCN_GRAPH_SOURCE_VERSION_CURRENT
+from lagtcn.core.data import TARGET_TIMESTAMP_SPLIT_VERSION
+from lagtcn.core.scaled_error import MASE_VERSION
+from lagtcn.core.metrics import calculate_level_metrics
+from lagtcn.core.training import _compute_metrics
 
 
 class FinalBatchProtocolTest(unittest.TestCase):
-    def test_phase1_counts_exclude_optional_phase2_extensions(self):
+    def test_formal_model_and_run_counts(self):
         current = build_ae_final_manifest.CURRENT_MODEL_CONFIGS
-        phase2 = build_ae_final_manifest.PHASE2_MODEL_CONFIGS
         self.assertEqual(len(current), 6)
-        self.assertNotIn("DEEPHGNN_SPECTGNN", {item["model"] for item in current})
-        self.assertEqual({item["model"] for item in phase2}, {"DEEPHGNN_SPECTGNN"})
+        self.assertEqual(
+            {item["model"] for item in current},
+            {"DLINEAR", "PATCHTST", "NHITS", "ITRANSFORMER", "DCRNN", "MTGNN"},
+        )
         self.assertEqual(len(benchmark_ae_final.MODELS), 7)
         datasets = len(build_ae_final_manifest.DATASETS)
         seeds = len(build_ae_final_manifest.SEEDS)
@@ -83,10 +84,9 @@ class FinalBatchProtocolTest(unittest.TestCase):
         self.assertEqual(result["MASE_version"], MASE_VERSION)
         self.assertEqual(result["MASE_n_excluded"], 0)
 
-    def test_phase2_is_formal_and_cannot_fall_back_to_legacy_mase(self):
+    def test_formal_stage_cannot_fall_back_to_legacy_mase(self):
         self.assertTrue(is_formal_ae_stage("ae_final_main_v1"))
-        self.assertTrue(is_formal_ae_stage("ae_phase2_ablation_v1"))
-        self.assertTrue(is_formal_ae_stage("ae_phase2_deephgnn_v1"))
+        self.assertFalse(is_formal_ae_stage("diagnostic_pilot"))
         self.assertFalse(is_formal_ae_stage("pilot"))
         truth = np.ones((3, 2, 24), dtype=np.float64)
         with self.assertRaisesRegex(ValueError, "refusing legacy MASE fallback"):
@@ -102,7 +102,7 @@ class FinalBatchProtocolTest(unittest.TestCase):
                 truth,
                 truth,
                 {
-                    "experiment_stage": "ae_phase2_ablation_v1",
+                    "experiment_stage": "ae_final_main_v1",
                     "bottom_start_idx": 1,
                     "num_bottom_nodes": 1,
                 },
@@ -432,7 +432,7 @@ class FinalBatchProtocolTest(unittest.TestCase):
                     "MASE": float(4 - index),
                 }))
             argv = [
-                "select_ae_final_hparams.py", "--runs-root", str(root),
+                "select_model_hparams", "--runs-root", str(root),
                 "--experiment-id", "tuning_a", "--output", str(output),
             ]
             with mock.patch.object(select_ae_final_hparams, "DATASETS", ("D",)), \
@@ -478,7 +478,7 @@ class FinalBatchProtocolTest(unittest.TestCase):
                 "MASE": 1.0,
             }))
             argv = [
-                "select_ae_final_hparams.py", "--runs-root", str(root),
+                "select_model_hparams", "--runs-root", str(root),
                 "--experiment-id", "tuning_a",
                 "--output", str(root / "selected.json"),
             ]
@@ -563,7 +563,7 @@ class FinalBatchProtocolTest(unittest.TestCase):
             write_attempt("candidate_3", 3)
 
             argv = [
-                "select_ae_final_hparams.py",
+                "select_model_hparams",
                 "--runs-root", str(runs),
                 "--experiment-id", "tuning_a",
                 "--terminal-status", str(terminal_status),
@@ -611,7 +611,7 @@ class FinalBatchProtocolTest(unittest.TestCase):
                         "WAPE": float(4 - index)
                     }))
             argv = [
-                "select_ae_final_hparams.py", "--runs-root", str(root),
+                "select_model_hparams", "--runs-root", str(root),
                 "--experiment-id", "tuning_a", "--output", str(output),
             ]
             with mock.patch.object(select_ae_final_hparams, "DATASETS", ("D",)), \

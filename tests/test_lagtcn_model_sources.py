@@ -44,12 +44,12 @@ def _install_torch_geometric_stub_if_missing() -> None:
 _install_torch_geometric_stub_if_missing()
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CODE_DIR = PROJECT_ROOT / "code"
+CODE_DIR = PROJECT_ROOT
 if str(CODE_DIR) not in sys.path:
     sys.path.insert(0, str(CODE_DIR))
 
-from models_additional_baselines import LAGTCNBaseline
-from graph_sparsity import FINAL_GRAPH_SOURCE_POLICY
+from lagtcn.models.graph_models import LAGTCNBaseline
+from lagtcn.core.graphs import FINAL_GRAPH_SOURCE_POLICY
 
 
 class LAGTCNIndependentSourceTest(unittest.TestCase):

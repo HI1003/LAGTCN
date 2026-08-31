@@ -11,10 +11,10 @@ import numpy as np
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT / "code") not in sys.path:
-    sys.path.insert(0, str(ROOT / "code"))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-from train_eval import train_model
+from lagtcn.core.training import train_model
 
 
 class _ToyForecast(torch.nn.Module):

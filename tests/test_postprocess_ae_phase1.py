@@ -11,15 +11,14 @@ import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-CODE_DIR = PROJECT_ROOT / "code"
-SCRIPTS_DIR = PROJECT_ROOT / "scripts"
+CODE_DIR = PROJECT_ROOT
+SCRIPTS_DIR = PROJECT_ROOT
 for path in (CODE_DIR, SCRIPTS_DIR):
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
 
-import mase
-import materialize_ae_run_predictions as materialize
-import postprocess_ae_phase1 as pp
+from lagtcn.core import scaled_error as mase
+from reproduction.evaluation import reconcile_forecasts as pp
 
 
 def build_synthetic_dataset(data_root: Path, name: str = "Synth_3level") -> dict:
@@ -94,7 +93,7 @@ def write_run(run_dir: Path, dataset_dir_name: str, node_order: list[str],
 
 def write_legacy_run(run_dir: Path, dataset_dir_name: str, node_order: list[str],
                      y_true: np.ndarray, y_base: np.ndarray, y_reconciled: np.ndarray,
-                     model_name: str = "GCN-GRU-LP", seed: int = 43) -> None:
+                     model_name: str = "LAGTCN", seed: int = 43) -> None:
     """Legacy layout: {prefix}_{model}_{timestamp}.csv + model_info with nested config."""
     run_dir.mkdir(parents=True)
     stem = f"{model_name}_20260601-000000"
@@ -253,7 +252,7 @@ class PostprocessEndToEndTest(unittest.TestCase):
         legacy = summary["Synth_3level/run_legacy"]
         self.assertEqual(legacy["status"], "ok")
         self.assertEqual(legacy["seed"], 43)  # from model_info's nested config
-        self.assertEqual(legacy["model_name"], "GCN-GRU-LP")
+        self.assertEqual(legacy["model_name"], "LAGTCN")
 
         metrics = pd.read_csv(self.output_dir / "phase1_metrics_long.csv")
         row = metrics[(metrics.run_id == "Synth_3level/run_legacy") & (metrics.method == "base")
@@ -475,8 +474,8 @@ class PostprocessEndToEndTest(unittest.TestCase):
 
 
     def test_clamp_provenance_uses_introduction_time_and_refreshes(self) -> None:
-        pre = pp.clamp_provenance("TIMESNET", "20260619_120000")
-        post = pp.clamp_provenance("TIMESNET", "20260623_120000")
+        pre = pp.clamp_provenance("LAGTCN", "20260619_120000")
+        post = pp.clamp_provenance("LAGTCN", "20260624_120000")
         self.assertTrue(pre["clamp_model_family"])
         self.assertFalse(pre["clamp_expected"])
         self.assertTrue(post["clamp_expected"])
@@ -507,107 +506,5 @@ class PostprocessEndToEndTest(unittest.TestCase):
 
 
 
-class MaterializeRunPredictionsTest(unittest.TestCase):
-    def test_materializes_four_predictions_and_explicit_metrics_idempotently(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "Data"
-            dataset = "Synth_3level"
-            fixture = build_synthetic_dataset(data_root, dataset)
-            ae_root = data_root / dataset / "output" / "ae"
-            run_dir = ae_root / "fixture" / "run_h3"
-            original = fixture["original"]
-            y_true = np.stack([
-                original[50 + sample: 53 + sample].T
-                for sample in range(5)
-            ])
-            y_pred = y_true.copy()
-            y_pred[:, 0, :] += 1.0
-            write_run(
-                run_dir,
-                dataset,
-                fixture["node_order"],
-                y_true,
-                y_pred,
-            )
-            output_dir = ae_root / "_postprocess_ae_phase1"
-            pp.run_postprocess(
-                ae_root,
-                data_root,
-                output_dir,
-                ["ols"],
-                save_reconciled=True,
-            )
-
-            summary = materialize.materialize_dataset(
-                dataset,
-                data_root=data_root,
-                workers=1,
-            )
-            self.assertEqual(summary["n_runs"], 1)
-            self.assertEqual(summary["n_base_renamed"], 1)
-            self.assertEqual(summary["n_written"], 3)
-            self.assertFalse((run_dir / "pred.csv").exists())
-
-            expected_files = {
-                "base": "base_pred.csv",
-                "bu": "bu_recon_pred.csv",
-                "td_fp": "td_recon_pred.csv",
-                "mint_ols": "mint_recon_pred.csv",
-            }
-            for filename in expected_files.values():
-                self.assertTrue((run_dir / filename).is_file(), filename)
-
-            base, nodes, index = pp.parse_prediction_csv(run_dir / "base_pred.csv")
-            np.testing.assert_allclose(base, y_pred, rtol=0.0, atol=1e-10)
-            archive = (
-                output_dir / "reconciled_predictions" / "fixture" / "run_h3"
-                / "reconciled_predictions.npz"
-            )
-            with np.load(archive, allow_pickle=False) as saved:
-                for method in ("bu", "td_fp", "mint_ols"):
-                    actual, actual_nodes, actual_index = pp.parse_prediction_csv(
-                        run_dir / expected_files[method]
-                    )
-                    np.testing.assert_allclose(
-                        actual, saved[method], rtol=0.0, atol=1e-10
-                    )
-                    self.assertEqual(actual_nodes, nodes)
-                    self.assertEqual(list(actual_index), list(index))
-
-            local_metrics = pd.read_csv(run_dir / "reconciliation_metrics.csv")
-            self.assertEqual(set(local_metrics["method"]), set(expected_files))
-            for method, filename in expected_files.items():
-                rows = local_metrics[local_metrics.method == method]
-                self.assertTrue((rows.prediction_file == filename).all())
-                expected_role = "base" if method == "base" else "reconciled"
-                expected_reconciliation = "none" if method == "base" else method
-                self.assertTrue((rows.prediction_role == expected_role).all())
-                self.assertTrue(
-                    (rows.reconciliation_method == expected_reconciliation).all()
-                )
-
-            global_metrics = pd.read_csv(output_dir / "phase1_metrics_long.csv")
-            self.assertEqual(
-                set(global_metrics.prediction_file), set(expected_files.values())
-            )
-            file_manifest = pd.read_csv(
-                output_dir / "prediction_files_manifest.csv"
-            )
-            self.assertEqual(len(file_manifest), 4)
-            self.assertEqual(
-                set(file_manifest.prediction_file), set(expected_files.values())
-            )
-
-            rerun = materialize.materialize_dataset(
-                dataset,
-                data_root=data_root,
-                workers=1,
-            )
-            self.assertEqual(rerun["n_base_renamed"], 0)
-            self.assertEqual(rerun["n_written"], 0)
-            self.assertEqual(rerun["n_skipped"], 3)
-            self.assertEqual(
-                len(pd.read_csv(output_dir / "prediction_files_manifest.csv")), 4
-            )
 if __name__ == "__main__":
     unittest.main()

@@ -9,20 +9,24 @@ import torch
 from torch_geometric.utils import dense_to_sparse
 
 ROOT = Path(__file__).resolve().parents[1]
-CODE = ROOT / "code"
+CODE = ROOT
 if str(CODE) not in sys.path:
     sys.path.insert(0, str(CODE))
 
-from graph_sparsity import FINAL_GRAPH_SOURCE_POLICY
-from main import _resolve_graph_adjacency_file
-from models_additional_baselines import (
+from lagtcn.core.graphs import FINAL_GRAPH_SOURCE_POLICY
+from lagtcn.train import _resolve_graph_adjacency_file
+from lagtcn.models.graph_models import (
     DCRNNBaseline,
-    ITransformerBaseline,
     LAGTCNBaseline,
     MTGNNBaseline,
 )
-from models_baselines_temporal import DLinearBaseline, NHiTSBaseline, PatchTSTBaseline
-from train_eval import _compute_model_loss, _config_fingerprint, _forward_training_model
+from lagtcn.models.temporal_baselines import (
+    DLinearBaseline,
+    ITransformerBaseline,
+    NHiTSBaseline,
+    PatchTSTBaseline,
+)
+from lagtcn.core.training import _compute_model_loss, _config_fingerprint, _forward_training_model
 
 
 class FinalModelOwnershipTest(unittest.TestCase):

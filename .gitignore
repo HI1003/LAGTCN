@@ -29,12 +29,9 @@ results/raw_manifests/
 *.xls
 *.xlsx
 
-# Keep repository documentation and small frozen JSON/CSV artifacts.
+# Keep preprocessing notebooks even though generated arrays are ignored.
 !data_preparation/**/
-!data_preparation/**/*.py
 !data_preparation/**/*.ipynb
-!configs/**
-!results/README.md
 
 # OS
 .DS_Store

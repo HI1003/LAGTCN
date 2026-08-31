@@ -8,9 +8,9 @@ coherent by construction:
   - BU:      b_tilde = max(b_hat, 0)
   - TD-FP:   p = max(b_hat,0) / sum(max(b_hat,0))  (uniform if the sum is 0),
              b_tilde = p * max(top_hat, 0)
-  - MinT:    b_tilde = argmin_{b >= 0} (y_hat - S b)' W^{-1} (y_hat - S b)
-             solved per sample/horizon by NNLS; W = I for OLS, diag error
-             variances for WLS, Ledoit-Wolf covariance for shrink.
+  - MinT-SHR: b_tilde = argmin_{b >= 0} (y_hat - S b)' W^{-1} (y_hat - S b),
+              solved per sample/horizon by NNLS, where W is a Ledoit-Wolf
+              covariance estimated from validation residuals.
 
 Every operator returns (y_tilde, diagnostics). This module is the single
 implementation shared by Phase 1 post-processing and the Phase 2 pipeline; it
@@ -18,15 +18,18 @@ is pure numpy/scipy and testable on synthetic fixtures.
 """
 from __future__ import annotations
 
+import argparse
 import contextlib
+import json
 import multiprocessing as mp
 import time
+from pathlib import Path
 
 import numpy as np
 
 RECONCILE_AE_VERSION = "ae_reconcile_nonneg_v2"
 
-AE_METHODS = ("bu", "td_fp", "mint_ols")
+AE_METHODS = ("bu", "td_fp", "mint_shrink")
 
 NNLS_PARALLEL_THRESHOLD = 1000
 _NNLS_WORKER_STATE = None
@@ -203,36 +206,23 @@ def reconcile_td_fp(
     return _finalize(b_tilde, S, bottom_start, diag, start)
 
 
-def estimate_mint_weight(
-    weight_mode: str,
-    *,
-    base_predictions: np.ndarray | None = None,
-    true_values: np.ndarray | None = None,
-) -> np.ndarray | None:
-    """Return W for the MinT objective, or None for the identity (OLS)."""
-    mode = str(weight_mode).lower().strip()
-    if mode in {"ols", "identity"}:
-        return None
-    if base_predictions is None or true_values is None:
-        raise ValueError(f"weight_mode='{mode}' requires base_predictions and true_values.")
-    y_hat = _as_3d(base_predictions)
-    y_true = _as_3d(true_values)
+def estimate_mint_shrink_weight(
+    validation_predictions: np.ndarray,
+    validation_true_values: np.ndarray,
+) -> np.ndarray:
+    """Estimate the MinT-SHR covariance using validation residuals only."""
+    y_hat = _as_3d(validation_predictions)
+    y_true = _as_3d(validation_true_values)
     if y_hat.shape != y_true.shape:
         raise ValueError(f"true_values shape {y_true.shape} != base_predictions shape {y_hat.shape}")
     errors = (y_true - y_hat).transpose(0, 2, 1).reshape(-1, y_hat.shape[1])
-    if mode in {"wls", "wls_var", "diag"}:
-        variances = np.var(errors, axis=0, ddof=1) if errors.shape[0] > 1 else np.ones(y_hat.shape[1])
-        variances = np.where(variances <= 0.0, 1e-8, variances)
-        return np.diag(variances)
-    if mode in {"shrink", "mint_shrink"}:
-        try:
-            from sklearn.covariance import LedoitWolf
-            W = LedoitWolf(assume_centered=False).fit(errors).covariance_
-        except ImportError:
-            sample = np.cov(errors, rowvar=False)
-            W = 0.5 * sample + 0.5 * np.diag(np.diag(sample))
-        return np.asarray(W, dtype=np.float64)
-    raise ValueError(f"Unsupported MinT weight_mode '{weight_mode}'.")
+    try:
+        from sklearn.covariance import LedoitWolf
+        weight = LedoitWolf(assume_centered=False).fit(errors).covariance_
+    except ImportError:
+        sample = np.cov(errors, rowvar=False)
+        weight = 0.5 * sample + 0.5 * np.diag(np.diag(sample))
+    return np.asarray(weight, dtype=np.float64)
 
 
 def _whitening_factor(W: np.ndarray | None, num_nodes: int, ridge: float = 1e-10) -> np.ndarray | None:
@@ -248,17 +238,15 @@ def _whitening_factor(W: np.ndarray | None, num_nodes: int, ridge: float = 1e-10
     return (eigenvectors / np.sqrt(eigenvalues)).T  # rows scaled by 1/sqrt(lambda)
 
 
-def reconcile_mint_nnls(
+def reconcile_mint_shrink(
     base_predictions: np.ndarray,
     sum_matrix: np.ndarray,
     *,
+    mint_weight: np.ndarray,
     bottom_start_idx: int | None = None,
-    weight_mode: str = "ols",
-    W: np.ndarray | None = None,
-    true_values: np.ndarray | None = None,
     nnls_workers: int = 1,
 ) -> tuple[np.ndarray, dict]:
-    """Nonnegative MinT: per sample/horizon NNLS in bottom space.
+    """Nonnegative MinT-SHR: per sample/horizon NNLS in bottom space.
 
     A column whose unconstrained MinT solution is already nonnegative keeps
     that solution — it is the exact NNLS optimum there — so NNLS runs only
@@ -275,9 +263,7 @@ def reconcile_mint_nnls(
     num_samples, num_nodes, num_horizons = y_hat.shape
     num_bottom = S.shape[1]
 
-    if W is None:
-        W = estimate_mint_weight(weight_mode, base_predictions=y_hat, true_values=true_values)
-    L = _whitening_factor(W, num_nodes)
+    L = _whitening_factor(mint_weight, num_nodes)
     S_w = S if L is None else L @ S
     G = np.linalg.pinv(S_w)  # [B, N]; SVD-based, avoids squaring the condition number
     nnls_maxiter = 3 * num_bottom
@@ -346,9 +332,9 @@ def reconcile_mint_nnls(
     b_tilde = b_solution.reshape(num_samples, num_horizons, num_bottom).transpose(0, 2, 1)
 
     diag = {
-        "method": f"mint_{str(weight_mode).lower().strip()}",
+        "method": "mint_shrink",
         "solver": "scipy.optimize.nnls",
-        "weight_mode": str(weight_mode).lower().strip(),
+        "weight_mode": "ledoit_wolf_shrinkage",
         "n_samples": int(num_samples),
         "n_horizons": int(num_horizons),
         "n_columns": int(columns.shape[0]),
@@ -375,28 +361,101 @@ def apply_reconciliation_ae(
     sum_matrix: np.ndarray,
     *,
     bottom_start_idx: int | None = None,
-    true_values: np.ndarray | None = None,
     mint_weight: np.ndarray | None = None,
     nnls_workers: int = 1,
 ) -> tuple[np.ndarray, dict]:
-    """Unified Applied Energy entry point.
+    """Apply one of the three reported methods: BU, TD-FP, or MinT-SHR.
 
-    Methods: 'bu', 'td_fp', 'mint_ols', 'mint_wls', 'mint_shrink'.
+    ``mint_weight`` must be estimated from validation residuals with
+    :func:`estimate_mint_shrink_weight`; requiring it here prevents accidental
+    covariance estimation on test targets.
     """
     name = str(method).lower().strip().replace("-", "_")
     if name == "bu":
         return reconcile_bu(base_predictions, sum_matrix, bottom_start_idx=bottom_start_idx)
     if name in {"td_fp", "tdfp", "td"}:
         return reconcile_td_fp(base_predictions, sum_matrix, bottom_start_idx=bottom_start_idx)
-    if name.startswith("mint"):
-        weight_mode = name.split("_", 1)[1] if "_" in name else "ols"
-        return reconcile_mint_nnls(
+    if name == "mint_shrink":
+        if mint_weight is None:
+            raise ValueError(
+                "mint_shrink requires a covariance matrix estimated from validation data"
+            )
+        return reconcile_mint_shrink(
             base_predictions,
             sum_matrix,
+            mint_weight=mint_weight,
             bottom_start_idx=bottom_start_idx,
-            weight_mode=weight_mode,
-            W=mint_weight,
-            true_values=true_values,
             nnls_workers=nnls_workers,
         )
     raise ValueError(f"Unsupported AE reconciliation method '{method}'.")
+
+
+def _load_prediction_archive(path: Path) -> tuple[np.lib.npyio.NpzFile, np.ndarray]:
+    archive = np.load(path, allow_pickle=False)
+    if "predictions" not in archive.files:
+        raise KeyError(f"{path} does not contain a 'predictions' array")
+    return archive, archive["predictions"]
+
+
+def main(argv: list[str] | None = None) -> None:
+    """Command-line interface for reconciling a saved LAGTCN forecast."""
+    parser = argparse.ArgumentParser(description="Apply BU, TD-FP, or MinT-SHR")
+    parser.add_argument("--method", choices=AE_METHODS, required=True)
+    parser.add_argument("--base-archive", type=Path, required=True)
+    parser.add_argument("--sum-matrix", type=Path, required=True)
+    parser.add_argument(
+        "--validation-archive",
+        type=Path,
+        help="Required for MinT-SHR; contains validation predictions and true_values.",
+    )
+    parser.add_argument("--bottom-start-idx", type=int, default=None)
+    parser.add_argument("--nnls-workers", type=int, default=1)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args(argv)
+
+    base_archive, base_predictions = _load_prediction_archive(args.base_archive)
+    sum_matrix = np.genfromtxt(args.sum_matrix, delimiter=",", dtype=np.float64)
+    if sum_matrix.ndim == 1:
+        sum_matrix = sum_matrix.reshape(-1, 1)
+    if sum_matrix.ndim == 2:
+        sum_matrix = sum_matrix[:, ~np.all(np.isnan(sum_matrix), axis=0)]
+    mint_weight = None
+    if args.method == "mint_shrink":
+        if args.validation_archive is None:
+            parser.error("--validation-archive is required for mint_shrink")
+        validation_archive, validation_predictions = _load_prediction_archive(
+            args.validation_archive
+        )
+        if "true_values" not in validation_archive.files:
+            raise KeyError("validation archive does not contain 'true_values'")
+        mint_weight = estimate_mint_shrink_weight(
+            validation_predictions,
+            validation_archive["true_values"],
+        )
+
+    reconciled, diagnostics = apply_reconciliation_ae(
+        args.method,
+        base_predictions,
+        sum_matrix,
+        bottom_start_idx=args.bottom_start_idx,
+        mint_weight=mint_weight,
+        nnls_workers=args.nnls_workers,
+    )
+    if args.method == "mint_shrink":
+        diagnostics["covariance_estimation"] = "validation_residuals_only"
+        diagnostics["validation_archive"] = str(args.validation_archive)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"predictions": reconciled.astype(np.float64)}
+    for key in ("true_values", "target_timestamps", "node_names"):
+        if key in base_archive.files:
+            payload[key] = base_archive[key]
+    np.savez_compressed(args.output, **payload)
+    diagnostics_path = args.output.with_suffix(".json")
+    diagnostics_path.write_text(
+        json.dumps(diagnostics, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
+
+
+if __name__ == "__main__":
+    main()

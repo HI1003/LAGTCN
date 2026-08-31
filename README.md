@@ -3,12 +3,9 @@
 Official source code for **LAGTCN: Level-Aware Graph-Temporal Co-Evolution
 with Multiple Graph Sources for Hierarchical Electric Load Forecasting**.
 
-This branch is intentionally a compact implementation repository. It contains
-the LAGTCN model, its data and graph pipeline, the training entry point, and
-the reported BU, TD-FP, and MinT-SHR reconciliation methods. Baseline models,
-large experiment manifests, and repository tests are not included. The former
-full-reproduction snapshot remains available at the Git tag
-[`full-reproduction-v1`](https://github.com/HI1003/LAGTCN/tree/full-reproduction-v1).
+This repository provides the implementation of the LAGTCN model, including
+the model architecture, data and graph pipeline, training and evaluation
+entry point, and the reported BU, TD-FP, and MinT-SHR reconciliation methods.
 
 [中文说明](README_zh-CN.md)
 
@@ -23,7 +20,7 @@ lagtcn/
 ├── metrics.py            Forecast and coherence metrics
 └── reconciliation.py     BU, TD-FP, and MinT-SHR
 data_preparation/          One preprocessing notebook per paper dataset
-examples/forward_pass.py  Dataset-free model-shape example
+examples/forward_pass.py  LAGTCN forward-pass example
 ```
 
 The model implementation is in [`lagtcn/model.py`](lagtcn/model.py). The three
@@ -32,8 +29,7 @@ post-hoc methods are all in
 
 ## Installation
 
-The code targets Python 3.10 and PyTorch 2.3. LAGTCN no longer depends on a
-baseline framework or PyTorch Geometric.
+The code targets Python 3.10 and PyTorch 2.3.
 
 ```bash
 conda create -n lagtcn python=3.10 -y
@@ -93,25 +89,7 @@ controls: `--static-threshold`, `--adaptive-top-k`, or
 configuration, metrics, validation predictions, and test base predictions to
 a timestamped directory below `Data/<dataset>/output/`.
 
-This reduced command is only a CPU software check; it is not a paper
-configuration:
-
-```bash
-python -m lagtcn.train \
-  --data-root Data \
-  --dataset GEFCom2012_2level \
-  --graph-mode H \
-  --num-timesteps-in 24 \
-  --num-timesteps-out 1 \
-  --hidden-dim 16 \
-  --num-layers 1 \
-  --batch-size 32 \
-  --epochs 1 \
-  --patience 1 \
-  --device cpu
-```
-
-A dataset-free 168→24 forward pass is also available:
+A 168→24 forward-pass example is also available:
 
 ```bash
 python -m examples.forward_pass

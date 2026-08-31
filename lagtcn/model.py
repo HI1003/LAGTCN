@@ -1,9 +1,8 @@
-"""Core implementation of the LAGTCN forecasting model.
+"""Implementation of the LAGTCN forecasting model.
 
-The public class in this module is intentionally self-contained: it contains
-only the transformations, graph-source construction, level awareness, patch
-transformer, graph-temporal co-evolution, and residual decoder used by LAGTCN.
-It does not inherit from any baseline-model framework.
+The public class contains the transformations, graph-source construction,
+level awareness, patch transformer, graph-temporal co-evolution, and residual
+decoder used by LAGTCN.
 """
 
 from __future__ import annotations

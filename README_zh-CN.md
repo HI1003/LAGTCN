@@ -3,11 +3,8 @@
 本仓库是论文 **LAGTCN: Level-Aware Graph-Temporal Co-Evolution with Multiple
 Graph Sources for Hierarchical Electric Load Forecasting** 的公开源码。
 
-当前 `main` 分支已精简为核心实现仓库，只保留 LAGTCN 模型、数据与图构建、训练
-评估入口，以及论文使用的 BU、TD-FP、MinT-SHR 三种调和方法。Baseline、批量实验
-manifest 和整套测试代码不再放在主分支；精简前的完整复现版本保存在 Git 标签
-[`full-reproduction-v1`](https://github.com/HI1003/LAGTCN/tree/full-reproduction-v1)，
-需要时可以完整恢复。
+本仓库提供 LAGTCN 模型的实现代码，包括模型结构、数据与图构建、训练评估入口，
+以及论文使用的 BU、TD-FP、MinT-SHR 三种调和方法。
 
 ## 目录结构
 
@@ -20,7 +17,7 @@ lagtcn/
 ├── metrics.py            预测精度与层级一致性指标
 └── reconciliation.py     BU、TD-FP、MinT-SHR
 data_preparation/          三个论文数据集的预处理 notebook
-examples/forward_pass.py  不依赖数据集的前向示例
+examples/forward_pass.py  LAGTCN 前向传播示例
 ```
 
 模型实现直接查看 [`lagtcn/model.py`](lagtcn/model.py)，三种调和方法集中在
@@ -28,8 +25,7 @@ examples/forward_pass.py  不依赖数据集的前向示例
 
 ## 安装
 
-代码面向 Python 3.10 和 PyTorch 2.3，精简后不再依赖 baseline 框架或 PyTorch
-Geometric。
+代码面向 Python 3.10 和 PyTorch 2.3。
 
 ```bash
 conda create -n lagtcn python=3.10 -y
@@ -85,24 +81,7 @@ python -m lagtcn.train \
 `Data/<dataset>/output/` 下的时间戳目录，包括最佳 checkpoint、配置、指标、验证集
 预测和测试集 base 预测。
 
-下面的 `24→1`、batch 32 仅用于快速检查 CPU 上能否运行，不是论文实验参数：
-
-```bash
-python -m lagtcn.train \
-  --data-root Data \
-  --dataset GEFCom2012_2level \
-  --graph-mode H \
-  --num-timesteps-in 24 \
-  --num-timesteps-out 1 \
-  --hidden-dim 16 \
-  --num-layers 1 \
-  --batch-size 32 \
-  --epochs 1 \
-  --patience 1 \
-  --device cpu
-```
-
-不依赖数据集的正式形状前向检查：
+还可以直接运行 168→24 的前向传播示例：
 
 ```bash
 python -m examples.forward_pass

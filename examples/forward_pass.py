@@ -1,4 +1,4 @@
-"""Minimal LAGTCN forward pass without an external dataset."""
+"""LAGTCN forward-pass example."""
 
 import numpy as np
 import torch

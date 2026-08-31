@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying paper."
+title: "LAGTCN: Level-Aware Graph-Temporal Co-Evolution with Multiple Graph Sources for Hierarchical Electric Load Forecasting"
+type: software
+version: 0.1.0
+date-released: 2026-08-31
+repository-code: "https://github.com/HI1003/LAGTCN"
+license: MIT
+authors:
+  - family-names: Hu
+    given-names: Guoping
+  - family-names: Giurcaneanu
+    given-names: Ciprian Doru
+  - family-names: Yu
+    given-names: Yunjun
+  - family-names: Chang
+    given-names: Qian
+  - family-names: Gong
+    given-names: Hai
+  - family-names: Chen
+    given-names: Fulong
+  - family-names: Zhan
+    given-names: Xiang
+

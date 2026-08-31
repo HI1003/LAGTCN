@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments and editors
+.env
+.env.*
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+
+# Runtime datasets and generated artifacts
+Data/
+logs/
+checkpoints/
+scripts/manifests/
+*.ckpt
+*.pt
+*.pth
+*.npy
+*.npz
+*.xls
+*.xlsx
+
+# Keep repository documentation and small frozen JSON/CSV artifacts.
+!data_preparation/**/
+!data_preparation/**/*.py
+!data_preparation/**/*.ipynb
+!configs/**
+!results/README.md
+
+# OS
+.DS_Store
+Thumbs.db
+

@@ -1,0 +1,758 @@
+{
+  "selection_protocol_version": "ae_graph_validation_accuracy_v4_original_persistence_unit",
+  "graph_design_protocol_version": "ae_graph_design_v5_accuracy_selected_independent_fusion",
+  "source_experiment_id": "260823j1_graph",
+  "source_git_revisions": [
+    {
+      "commit": "2632ab7755a80d5759e34fdcfb4450e057fd3d4a",
+      "branch": "paper/applied-energy"
+    },
+    {
+      "commit": "40a024c236a8ba5efecd7eeddb5c9a9eeb4d5dfc",
+      "branch": "paper/applied-energy"
+    },
+    {
+      "commit": "5b5f3a1ca022f21794cd1811d9c5d01e55d5a128",
+      "branch": "paper/applied-energy"
+    },
+    {
+      "commit": "8cd31022c6b03ddcfbafb6026f20b5383c5f6c77",
+      "branch": "paper/applied-energy"
+    }
+  ],
+  "runtime_git_binding": "provenance_only",
+  "model_selection_source_experiment_id": "260812j0_eta1_original",
+  "model_selection_protocol_version": "ae_phase1_validation_wape_v6_one_finite_terminal_outcomes",
+  "selection_scope_datasets": [
+    "GEFCom2012_2level",
+    "GEFCom2017QualifyingMatch_3level",
+    "GEFCom2017FinalMatch_4level"
+  ],
+  "test_results_accessed": false,
+  "non_graph_invariants_by_dataset": {
+    "GEFCom2012_2level": {
+      "model_name": "LAGTCN",
+      "num_timesteps_in": 168,
+      "num_timesteps_out": 24,
+      "feature_set": "target",
+      "sim_type": "cosine",
+      "seed": 42,
+      "lr": 0.0005,
+      "hidden_dim": 64,
+      "num_layers": 2,
+      "batch_size": 128,
+      "epochs": 150,
+      "patience": 20,
+      "lagtcn_graph_source_version": "threshold_topk_hanchor_residual_v4",
+      "graph_design_protocol_version": "ae_graph_design_v5_accuracy_selected_independent_fusion",
+      "split_protocol_version": "target_timestamp_80_10_10_v1",
+      "selection_source_experiment_id": "260812j0_eta1_original",
+      "selection_protocol_version": "ae_phase1_validation_wape_v6_one_finite_terminal_outcomes",
+      "training_loss_space": "original",
+      "lagtcn_decoder_mode": "persistence_residual",
+      "lagtcn_residual_scale_mode": "unit",
+      "lagtcn_residual_scale_init": 1.0
+    },
+    "GEFCom2017FinalMatch_4level": {
+      "model_name": "LAGTCN",
+      "num_timesteps_in": 168,
+      "num_timesteps_out": 24,
+      "feature_set": "target",
+      "sim_type": "cosine",
+      "seed": 42,
+      "lr": 0.0005,
+      "hidden_dim": 128,
+      "num_layers": 2,
+      "batch_size": 128,
+      "epochs": 150,
+      "patience": 20,
+      "lagtcn_graph_source_version": "threshold_topk_hanchor_residual_v4",
+      "graph_design_protocol_version": "ae_graph_design_v5_accuracy_selected_independent_fusion",
+      "split_protocol_version": "target_timestamp_80_10_10_v1",
+      "selection_source_experiment_id": "260812j0_eta1_original",
+      "selection_protocol_version": "ae_phase1_validation_wape_v6_one_finite_terminal_outcomes",
+      "training_loss_space": "original",
+      "lagtcn_decoder_mode": "persistence_residual",
+      "lagtcn_residual_scale_mode": "unit",
+      "lagtcn_residual_scale_init": 1.0
+    },
+    "GEFCom2017QualifyingMatch_3level": {
+      "model_name": "LAGTCN",
+      "num_timesteps_in": 168,
+      "num_timesteps_out": 24,
+      "feature_set": "target",
+      "sim_type": "cosine",
+      "seed": 42,
+      "lr": 0.001,
+      "hidden_dim": 64,
+      "num_layers": 2,
+      "batch_size": 128,
+      "epochs": 150,
+      "patience": 20,
+      "lagtcn_graph_source_version": "threshold_topk_hanchor_residual_v4",
+      "graph_design_protocol_version": "ae_graph_design_v5_accuracy_selected_independent_fusion",
+      "split_protocol_version": "target_timestamp_80_10_10_v1",
+      "selection_source_experiment_id": "260812j0_eta1_original",
+      "selection_protocol_version": "ae_phase1_validation_wape_v6_one_finite_terminal_outcomes",
+      "training_loss_space": "original",
+      "lagtcn_decoder_mode": "persistence_residual",
+      "lagtcn_residual_scale_mode": "unit",
+      "lagtcn_residual_scale_init": 1.0
+    }
+  },
+  "selected": {
+    "GEFCom2012_2level": {
+      "adaptive_top_k": 16,
+      "dynamic_threshold": 0.6,
+      "static_threshold": 0.8
+    },
+    "GEFCom2017QualifyingMatch_3level": {
+      "adaptive_top_k": 8,
+      "dynamic_threshold": 0.6,
+      "static_threshold": 0.7
+    },
+    "GEFCom2017FinalMatch_4level": {
+      "adaptive_top_k": 128,
+      "dynamic_threshold": 0.7,
+      "static_threshold": 0.6
+    }
+  },
+  "audit": [
+    {
+      "dataset": "GEFCom2012_2level",
+      "graph_source": "A",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 6.448086966947852,
+      "selected_value": 16,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k0_260823153024",
+          "status": "finite",
+          "validation_objective": 7.405658679532253,
+          "validation_smase": 0.9121199977818519,
+          "difference_from_selected_WAPE": 0.957571712584401
+        },
+        {
+          "value": 16,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k16_260823173511",
+          "status": "finite",
+          "validation_objective": 6.448086966947852,
+          "validation_smase": 0.8409251954677149,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 1,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k1_260823155524",
+          "status": "finite",
+          "validation_objective": 6.843945699664447,
+          "validation_smase": 0.8527625537887309,
+          "difference_from_selected_WAPE": 0.39585873271659455
+        },
+        {
+          "value": 20,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k20_260823175452",
+          "status": "finite",
+          "validation_objective": 6.448086966947852,
+          "validation_smase": 0.8409251954677149,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 2,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k2_260823163105",
+          "status": "finite",
+          "validation_objective": 6.714092745938948,
+          "validation_smase": 0.8487884596254348,
+          "difference_from_selected_WAPE": 0.26600577899109545
+        },
+        {
+          "value": 4,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k4_260823165542",
+          "status": "finite",
+          "validation_objective": 6.557403858925937,
+          "validation_smase": 0.8418035797132101,
+          "difference_from_selected_WAPE": 0.10931689197808492
+        },
+        {
+          "value": 8,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k8_260823171534",
+          "status": "finite",
+          "validation_objective": 6.624081913028309,
+          "validation_smase": 0.8424083777787736,
+          "difference_from_selected_WAPE": 0.17599494608045685
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2012_2level",
+      "graph_source": "D",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 6.5212699858989955,
+      "selected_value": 0.6,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p5_260823181448",
+          "status": "finite",
+          "validation_objective": 6.6278840629492235,
+          "validation_smase": 0.8579443020645088,
+          "difference_from_selected_WAPE": 0.10661407705022796
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p6_260823183117",
+          "status": "finite",
+          "validation_objective": 6.5212699858989955,
+          "validation_smase": 0.836012474641862,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p7_260823184924",
+          "status": "finite",
+          "validation_objective": 6.571003933177336,
+          "validation_smase": 0.8441977407976973,
+          "difference_from_selected_WAPE": 0.049733947278340906
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p8_260823190715",
+          "status": "finite",
+          "validation_objective": 6.5486001135056835,
+          "validation_smase": 0.8352480128710437,
+          "difference_from_selected_WAPE": 0.02733012760668796
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p95_260823194649",
+          "status": "finite",
+          "validation_objective": 6.729871582493419,
+          "validation_smase": 0.8514271775739265,
+          "difference_from_selected_WAPE": 0.20860159659442346
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p99_260823200735",
+          "status": "finite",
+          "validation_objective": 7.0955877388651585,
+          "validation_smase": 0.9105103817714816,
+          "difference_from_selected_WAPE": 0.5743177529661629
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p9_260823192822",
+          "status": "finite",
+          "validation_objective": 6.680254257405346,
+          "validation_smase": 0.8525770906881279,
+          "difference_from_selected_WAPE": 0.15898427150635008
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2012_2level",
+      "graph_source": "S",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 6.63441303775319,
+      "selected_value": 0.8,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p5_260823121444",
+          "status": "finite",
+          "validation_objective": 6.636260263777968,
+          "validation_smase": 0.8413414049542423,
+          "difference_from_selected_WAPE": 0.0018472260247781591
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p6_260823133836",
+          "status": "finite",
+          "validation_objective": 6.648836578075979,
+          "validation_smase": 0.840588215984444,
+          "difference_from_selected_WAPE": 0.01442354032278903
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p7_260823135542",
+          "status": "finite",
+          "validation_objective": 6.66085655652987,
+          "validation_smase": 0.854712186037594,
+          "difference_from_selected_WAPE": 0.02644351877667983
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p8_260823141010",
+          "status": "finite",
+          "validation_objective": 6.63441303775319,
+          "validation_smase": 0.8559963846686847,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p95_260823144915",
+          "status": "finite",
+          "validation_objective": 6.757159050600872,
+          "validation_smase": 0.8794451995551559,
+          "difference_from_selected_WAPE": 0.12274601284768138
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p99_260823150421",
+          "status": "finite",
+          "validation_objective": 6.822643551862219,
+          "validation_smase": 0.8778320827835204,
+          "difference_from_selected_WAPE": 0.18823051410902902
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2012_2level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p9_260823143301",
+          "status": "finite",
+          "validation_objective": 6.659695347265311,
+          "validation_smase": 0.8525964230291659,
+          "difference_from_selected_WAPE": 0.025282309512120626
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017FinalMatch_4level",
+      "graph_source": "A",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 7.039709279478429,
+      "selected_value": 128,
+      "candidate_count": 11,
+      "candidates": [
+        {
+          "value": 0,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k0_260829073454",
+          "status": "finite",
+          "validation_objective": 7.868874833410904,
+          "validation_smase": 0.8244989916475757,
+          "difference_from_selected_WAPE": 0.8291655539324747
+        },
+        {
+          "value": 128,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k128_260830065623",
+          "status": "finite",
+          "validation_objective": 7.039709279478429,
+          "validation_smase": 0.802479077093591,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 157,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k157_260830082423",
+          "status": "finite",
+          "validation_objective": 7.039709279478429,
+          "validation_smase": 0.802479077093591,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 16,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k16_260830004504",
+          "status": "finite",
+          "validation_objective": 7.068594137567156,
+          "validation_smase": 0.7866320911103943,
+          "difference_from_selected_WAPE": 0.028884858088726872
+        },
+        {
+          "value": 1,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k1_260829130002",
+          "status": "finite",
+          "validation_objective": 7.8796495458190625,
+          "validation_smase": 0.8196385537542971,
+          "difference_from_selected_WAPE": 0.8399402663406335
+        },
+        {
+          "value": 2,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k2_260829172330",
+          "status": "finite",
+          "validation_objective": 7.634428136117349,
+          "validation_smase": 0.8144731775811708,
+          "difference_from_selected_WAPE": 0.5947188566389201
+        },
+        {
+          "value": 32,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k32_260830021940",
+          "status": "finite",
+          "validation_objective": 7.105580338670194,
+          "validation_smase": 0.8048180874976478,
+          "difference_from_selected_WAPE": 0.06587105919176484
+        },
+        {
+          "value": 4,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k4_260829211443",
+          "status": "finite",
+          "validation_objective": 7.206115975104905,
+          "validation_smase": 0.785638860417613,
+          "difference_from_selected_WAPE": 0.1664066956264758
+        },
+        {
+          "value": 64,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k64_260830035151",
+          "status": "finite",
+          "validation_objective": 7.072952460568426,
+          "validation_smase": 0.8021730955577272,
+          "difference_from_selected_WAPE": 0.03324318108999691
+        },
+        {
+          "value": 8,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k8_260829231014",
+          "status": "finite",
+          "validation_objective": 7.162188102463641,
+          "validation_smase": 0.7952512537564594,
+          "difference_from_selected_WAPE": 0.12247882298521162
+        },
+        {
+          "value": 96,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/A/lagtcn_A_h24_s42_k96_260830052406",
+          "status": "finite",
+          "validation_objective": 7.065002289419727,
+          "validation_smase": 0.8076027064343035,
+          "difference_from_selected_WAPE": 0.025293009941298017
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017FinalMatch_4level",
+      "graph_source": "D",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 7.046572945678155,
+      "selected_value": 0.7,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p5_260829122527",
+          "status": "finite",
+          "validation_objective": 7.0703481604527285,
+          "validation_smase": 0.7934947919728417,
+          "difference_from_selected_WAPE": 0.023775214774573783
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p6_260829165939",
+          "status": "finite",
+          "validation_objective": 7.053696697578331,
+          "validation_smase": 0.7884006418131787,
+          "difference_from_selected_WAPE": 0.00712375190017589
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p7_260830095223",
+          "status": "finite",
+          "validation_objective": 7.046572945678155,
+          "validation_smase": 0.7922041840283738,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p8_260830131018",
+          "status": "finite",
+          "validation_objective": 7.09924676518992,
+          "validation_smase": 0.806714712476952,
+          "difference_from_selected_WAPE": 0.05267381951176553
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p95_260830183627",
+          "status": "finite",
+          "validation_objective": 7.134330049433015,
+          "validation_smase": 0.8181604980364454,
+          "difference_from_selected_WAPE": 0.08775710375486057
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p99_260830213536",
+          "status": "finite",
+          "validation_objective": 7.341893669829074,
+          "validation_smase": 0.8547990649843127,
+          "difference_from_selected_WAPE": 0.29532072415091903
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/D/lagtcn_D_h24_s42_t0p9_260830160511",
+          "status": "finite",
+          "validation_objective": 7.126723524955355,
+          "validation_smase": 0.816496965436039,
+          "difference_from_selected_WAPE": 0.08015057927720015
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017FinalMatch_4level",
+      "graph_source": "S",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 7.141189979314058,
+      "selected_value": 0.6,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p5_260828115153",
+          "status": "finite",
+          "validation_objective": 7.164318229760849,
+          "validation_smase": 0.8004747769933889,
+          "difference_from_selected_WAPE": 0.02312825044679112
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p6_260828144958",
+          "status": "finite",
+          "validation_objective": 7.141189979314058,
+          "validation_smase": 0.812076326553042,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p7_260828172429",
+          "status": "finite",
+          "validation_objective": 7.1743738057187,
+          "validation_smase": 0.8045554051722623,
+          "difference_from_selected_WAPE": 0.03318382640464179
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p8_260828200617",
+          "status": "finite",
+          "validation_objective": 7.195428797894916,
+          "validation_smase": 0.8117829615628307,
+          "difference_from_selected_WAPE": 0.054238818580857995
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p95_260829013430",
+          "status": "finite",
+          "validation_objective": 7.238951266194067,
+          "validation_smase": 0.8288329414377126,
+          "difference_from_selected_WAPE": 0.09776128688000885
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p99_260829042506",
+          "status": "finite",
+          "validation_objective": 7.550836796530674,
+          "validation_smase": 0.86367812184829,
+          "difference_from_selected_WAPE": 0.40964681721661567
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2017FinalMatch_4level/output/ae/j1/260823j1_graph/S_cos/lagtcn_S_h24_s42_t0p9_260828224038",
+          "status": "finite",
+          "validation_objective": 7.213353953719326,
+          "validation_smase": 0.8176576993036319,
+          "difference_from_selected_WAPE": 0.07216397440526823
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017QualifyingMatch_3level",
+      "graph_source": "A",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 3.2522171407465565,
+      "selected_value": 8,
+      "candidate_count": 6,
+      "candidates": [
+        {
+          "value": 0,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k0_260823234326",
+          "status": "finite",
+          "validation_objective": 3.3272196678730905,
+          "validation_smase": 0.5474390077335336,
+          "difference_from_selected_WAPE": 0.07500252712653399
+        },
+        {
+          "value": 14,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k14_260824024005",
+          "status": "finite",
+          "validation_objective": 3.2994023323770416,
+          "validation_smase": 0.545464333327732,
+          "difference_from_selected_WAPE": 0.04718519163048507
+        },
+        {
+          "value": 1,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k1_260824002720",
+          "status": "finite",
+          "validation_objective": 3.3557552978362657,
+          "validation_smase": 0.5487471680529251,
+          "difference_from_selected_WAPE": 0.10353815708970915
+        },
+        {
+          "value": 2,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k2_260824005947",
+          "status": "finite",
+          "validation_objective": 3.25592103302628,
+          "validation_smase": 0.5382171317351943,
+          "difference_from_selected_WAPE": 0.003703892279723675
+        },
+        {
+          "value": 4,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k4_260824013630",
+          "status": "finite",
+          "validation_objective": 3.2624973405509095,
+          "validation_smase": 0.5470894246870174,
+          "difference_from_selected_WAPE": 0.010280199804352907
+        },
+        {
+          "value": 8,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/A/lagtcn_A_h24_s42_k8_260824020645",
+          "status": "finite",
+          "validation_objective": 3.2522171407465565,
+          "validation_smase": 0.5426576393376611,
+          "difference_from_selected_WAPE": 0.0
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017QualifyingMatch_3level",
+      "graph_source": "D",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 3.293709918089795,
+      "selected_value": 0.6,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p5_260824033538",
+          "status": "finite",
+          "validation_objective": 3.3005038146606127,
+          "validation_smase": 0.5544123336282508,
+          "difference_from_selected_WAPE": 0.006793896570817637
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p6_260824040310",
+          "status": "finite",
+          "validation_objective": 3.293709918089795,
+          "validation_smase": 0.5512168036579089,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p7_260824043246",
+          "status": "finite",
+          "validation_objective": 3.3019779744350095,
+          "validation_smase": 0.5512398624218827,
+          "difference_from_selected_WAPE": 0.008268056345214436
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p8_260824050221",
+          "status": "finite",
+          "validation_objective": 3.307082323328046,
+          "validation_smase": 0.5525301412913478,
+          "difference_from_selected_WAPE": 0.013372405238250895
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p95_260824060726",
+          "status": "finite",
+          "validation_objective": 3.3211642117819413,
+          "validation_smase": 0.5542903444452555,
+          "difference_from_selected_WAPE": 0.027454293692146248
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p99_260824063704",
+          "status": "finite",
+          "validation_objective": 3.430484161959931,
+          "validation_smase": 0.5534501064955389,
+          "difference_from_selected_WAPE": 0.13677424387013604
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/D/lagtcn_D_h24_s42_t0p9_260824053529",
+          "status": "finite",
+          "validation_objective": 3.326670681754303,
+          "validation_smase": 0.5538306412953969,
+          "difference_from_selected_WAPE": 0.03296076366450773
+        }
+      ]
+    },
+    {
+      "dataset": "GEFCom2017QualifyingMatch_3level",
+      "graph_source": "S",
+      "selection_metric": "all_level_mean_1_24_validation_WAPE_pct",
+      "secondary_tie_break_metric": "all_level_mean_1_24_validation_smase",
+      "selection_rule": "minimum_validation_WAPE_then_smase",
+      "selected_validation_WAPE": 3.290135752212196,
+      "selected_value": 0.7,
+      "candidate_count": 7,
+      "candidates": [
+        {
+          "value": 0.5,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p5_260823202356",
+          "status": "finite",
+          "validation_objective": 3.3087759425785794,
+          "validation_smase": 0.5549749781846826,
+          "difference_from_selected_WAPE": 0.018640190366383536
+        },
+        {
+          "value": 0.6,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p6_260823204904",
+          "status": "finite",
+          "validation_objective": 3.294255068272488,
+          "validation_smase": 0.5464625459078448,
+          "difference_from_selected_WAPE": 0.004119316060291922
+        },
+        {
+          "value": 0.7,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p7_260823211837",
+          "status": "finite",
+          "validation_objective": 3.290135752212196,
+          "validation_smase": 0.5511191957298406,
+          "difference_from_selected_WAPE": 0.0
+        },
+        {
+          "value": 0.8,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p8_260823214430",
+          "status": "finite",
+          "validation_objective": 3.308673485477839,
+          "validation_smase": 0.5507946856040712,
+          "difference_from_selected_WAPE": 0.01853773326564312
+        },
+        {
+          "value": 0.95,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p95_260823223732",
+          "status": "finite",
+          "validation_objective": 3.304834208562927,
+          "validation_smase": 0.5470375419608472,
+          "difference_from_selected_WAPE": 0.014698456350731082
+        },
+        {
+          "value": 0.99,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p99_260823230814",
+          "status": "finite",
+          "validation_objective": 3.3779992262417173,
+          "validation_smase": 0.5501269368915046,
+          "difference_from_selected_WAPE": 0.08786347402952144
+        },
+        {
+          "value": 0.9,
+          "run_dir": "Data/GEFCom2017QualifyingMatch_3level/output/ae/batch_current_20260824/j1/S_cos/lagtcn_S_h24_s42_t0p9_260823221203",
+          "status": "finite",
+          "validation_objective": 3.3216712801210786,
+          "validation_smase": 0.5563879411166351,
+          "difference_from_selected_WAPE": 0.0315355279088827
+        }
+      ]
+    }
+  ]
+}
